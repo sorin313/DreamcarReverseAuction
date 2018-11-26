@@ -1,0 +1,7 @@
+.create-panel-open {
+	display: block;
+}
+
+.create-panel-close {
+	display: none;	
+}

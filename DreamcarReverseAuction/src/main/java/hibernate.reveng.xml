@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+	<table-filter match-schema="dreamcar_reverse_auction"
+		match-name=".*" />
+	<table catalog="dreamcar_reverse_auction" name="bid" class="Bid">
+		<column name="bidId"></column>
+		<column name="amount"></column>
+		<column name="userId"></column>
+		<column name="auctionId"></column>
+	</table>
+	<table catalog="dreamcar_reverse_auction" name="company" class="Company">
+		<column name="companyId"></column>
+		<column name="name"></column>
+	</table>
+	<table catalog="dreamcar_reverse_auction" name="user" class="User">
+		<column name="userId"></column>
+		<column name="username"></column>
+		<column name="password"></column>
+		<column name="email"></column>
+		<column name="phoneNumber"></column>
+		<column name="IsActivated"></column>
+		<column name="userTypeId"></column>
+		<column name="companyId"></column>
+	</table>
+	<table catalog="dreamcar_reverse_auction" name="component" class="Component">
+		<column name="componentId"></column>
+		<column name="name"></column>
+	</table>
+	<table catalog="dreamcar_reverse_auction" name="auction">
+		<column name="auctionId"></column>
+		<column name="currencyType"></column>
+		<column name="targetPrice"></column>
+		<column name="endDate"></column>
+		<column name="quantity"></column>
+		<column name="ownerId"></column>
+		<column name="componentId"></column>
+		<column name="statusId"></column>
+		<column name="winnerId"></column>
+	</table>
+</hibernate-reverse-engineering>
