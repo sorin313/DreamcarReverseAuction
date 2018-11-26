@@ -45,7 +45,8 @@ public class BidController {
 		CreateBidViewModel bidViewModel = new CreateBidViewModel(bidAmount, userId, selectedAuctionId);
 		
 		bidService.createBid(bidViewModel);
-		
-		return goToBids(session, model, selectedAuctionId);
+
+		auctionService.checkEndedAuctions();
+		return  "redirect:/auctions/bids?selectedAuctionId=" + selectedAuctionId;
 	}
 }

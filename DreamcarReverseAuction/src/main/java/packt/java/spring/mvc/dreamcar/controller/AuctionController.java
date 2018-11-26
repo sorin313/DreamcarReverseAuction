@@ -34,6 +34,7 @@ public class AuctionController {
 			return "unauthorizedView";
 		}
 
+		auctionService.checkEndedAuctions();
 		List<String> currencies = Arrays.asList("EUR", "USD",
 				"GBP", "CHF", "CNY");
 

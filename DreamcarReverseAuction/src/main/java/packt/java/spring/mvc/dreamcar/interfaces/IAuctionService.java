@@ -10,4 +10,5 @@ public interface IAuctionService {
 	public boolean createAuction(CreateAuctionViewModel auctionViewModel);
 	public List<AuctionViewModel> getAuctions();
 	public AuctionDetailViewModel getAuctionDetails(int auctionId);
+	public void checkEndedAuctions();
 }

@@ -20,7 +20,7 @@ public class ComponentService implements IComponentService {
 	}
 
 	private static SessionFactory factory = SessionFactoryHelper
-			.getSessionFactory();
+			.getSessionfactory();
 
 	@SuppressWarnings("unchecked")
 	public List<Component> getComponentList() {

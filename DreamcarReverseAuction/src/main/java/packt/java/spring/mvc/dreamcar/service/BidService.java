@@ -24,7 +24,7 @@ import packt.java.spring.mvc.dreamcar.viewmodels.CreateBidViewModel;
 public class BidService implements IBidService {
 
 	private static SessionFactory factory = SessionFactoryHelper
-			.getSessionFactory();
+			.getSessionfactory();
 	
 	public BidService(){
 	}
@@ -74,7 +74,7 @@ public class BidService implements IBidService {
 		List<BidViewModel> bidViewModels = null;
 		
 		try {
-			SQLQuery query = (SQLQuery) session.createSQLQuery("select * from Bid where auctionId=:auctionId")
+			SQLQuery query = (SQLQuery) session.createSQLQuery("select * from Bid where auctionId=:auctionId order by Amount")
 					.setParameter("auctionId", auctionId);
 			
 			bids = (List<Bid>) query.addEntity(Bid.class).list();

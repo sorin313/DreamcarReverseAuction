@@ -22,8 +22,7 @@ public class SessionFactoryHelper {
 		return null;
 	}
 
-	public static SessionFactory getSessionFactory() {
+	public static SessionFactory getSessionfactory() {
 		return sessionFactory;
 	}
-
 }

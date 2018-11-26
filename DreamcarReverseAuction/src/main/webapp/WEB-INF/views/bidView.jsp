@@ -46,18 +46,27 @@
 	<br>
 	<br>
 	<h3 class="text-center">
-		<span class="label label-primary">Bids for auction #${selectedAuctionId}</span>
+		<span class="label label-primary">Bids for auction
+			#${selectedAuctionId}</span>
 	</h3>
+
+
+
 	<div class="container">
 		<spring:eval
 			expression="loggedUser.getUserTypeId() != T(packt.java.spring.mvc.dreamcar.enums.UserTypeEnum).AuctionOwner"
 			var="isProvider" />
-		<c:choose>
 
-			<c:when test="${isProvider}">
+		<spring:eval
+			expression="auctionDetail.getStatusId() == T(packt.java.spring.mvc.dreamcar.enums.AuctionStatusEnum).Ended"
+			var="hasEndedStatus" />
+		<c:choose>
+			<c:when test="${isProvider && !hasEndedStatus}">
 				<%@include file="createBid.jsp"%>
 			</c:when>
 		</c:choose>
+
+	<%@include file="auctionDetail.jsp"%>
 		<br> <br>
 		<table class="table table-condensed col-md-5"
 			style="background-color: white; box-shadow: 1px 1px 1px #999;">
@@ -75,10 +84,10 @@
 					<c:when test="${bids != null}">
 						<c:forEach items="${bids}" var="bid">
 							<tr>
-								<td>#${bid.getBidId()} </td>
+								<td>#${bid.getBidId()}</td>
 								<td>${bid.getAmount()}</td>
-								<td>${bid.getBidderUsername()} </td>
-								<td>${bid.getCompanyName()} </td>
+								<td>${bid.getBidderUsername()}</td>
+								<td>${bid.getCompanyName()}</td>
 								<td>${bid.getCreatedDate().toString()}</td>
 							</tr>
 						</c:forEach>

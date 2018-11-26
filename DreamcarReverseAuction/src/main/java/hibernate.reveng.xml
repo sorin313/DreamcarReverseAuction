@@ -20,7 +20,6 @@
 		<column name="password"></column>
 		<column name="email"></column>
 		<column name="phoneNumber"></column>
-		<column name="IsActivated"></column>
 		<column name="userTypeId"></column>
 		<column name="companyId"></column>
 	</table>

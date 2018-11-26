@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import packt.java.spring.mvc.dreamcar.enums.AuctionStatusEnum;
 import packt.java.spring.mvc.dreamcar.interfaces.IAuctionService;
 import packt.java.spring.mvc.dreamcar.pojo.Auction;
+import packt.java.spring.mvc.dreamcar.pojo.Bid;
 import packt.java.spring.mvc.dreamcar.pojo.Component;
 import packt.java.spring.mvc.dreamcar.pojo.User;
 import packt.java.spring.mvc.dreamcar.viewmodels.AuctionDetailViewModel;
@@ -27,7 +28,7 @@ import packt.java.spring.mvc.dreamcar.viewmodels.CreateAuctionViewModel;
 public class AuctionService implements IAuctionService {
 
 	private static SessionFactory factory = SessionFactoryHelper
-			.getSessionFactory();
+			.getSessionfactory();
 
 	private List<AuctionViewModel> auctionViewModels = null;
 
@@ -61,7 +62,7 @@ public class AuctionService implements IAuctionService {
 		newAuction.setQuantity(auctionViewModel.getQuantity());
 		newAuction.setComponent(newComponent);
 		newAuction.setTargetPrice(auctionViewModel.getTargetPrice());
-		newAuction.setOwner(owner);
+		newAuction.setUserByOwnerId(owner);
 		newAuction.setCurrencyType(auctionViewModel.getCurrencyType());
 
 		try {
@@ -95,10 +96,10 @@ public class AuctionService implements IAuctionService {
 				for (Auction auction : auctions) {
 					AuctionStatusEnum statusId = AuctionStatusEnum
 							.getType(auction.getStatusId());
-					Hibernate.initialize(auction.getOwner());
+					Hibernate.initialize(auction.getUserByOwnerId());
 					Hibernate.initialize(auction.getComponent());
 
-					User owner = auction.getOwner();
+					User owner = auction.getUserByOwnerId();
 					Component component = auction.getComponent();
 					AuctionViewModel newAuction = new AuctionViewModel(
 							auction.getAuctionId(), component, owner,
@@ -121,6 +122,7 @@ public class AuctionService implements IAuctionService {
 		return auctionViewModels;
 	}
 
+	@SuppressWarnings("unchecked")
 	public AuctionDetailViewModel getAuctionDetails(int auctionId) {
 		Session session = factory.openSession();
 		Auction auction = null;
@@ -128,18 +130,26 @@ public class AuctionService implements IAuctionService {
 		try {
 			SQLQuery sqlQuery = (SQLQuery) session.createSQLQuery(
 					"select * from Auction where auctionId=:auctionId")
-					.setParameter("auctionid", auctionId);
-			auction = (Auction) sqlQuery.addEntity(Auction.class).list().get(0);
-			Hibernate.initialize(auction.getComponent());
-			Component component = auction.getComponent();
+					.setParameter("auctionId", auctionId);
+			List<Auction> auctions = (ArrayList<Auction>) sqlQuery.addEntity(
+					Auction.class).list();
+			auction = auctions.get(0);
 			
+			Hibernate.initialize(auction.getComponent());
+			Hibernate.initialize(auction.getUserByWinnerId());
+			Component component = auction.getComponent();
+			User winner = auction.getUserByWinnerId();
+
 			auctionDetail = new AuctionDetailViewModel();
 			auctionDetail.setTargetPrice(auction.getTargetPrice());
 			auctionDetail.setStartDate(auction.getStartDate());
+			auctionDetail.setEndDate(auction.getEndDate());
 			auctionDetail.setComponentName(component.getName());
 			auctionDetail.setQuantity(auction.getQuantity());
 			auctionDetail.setCurrencyType(auction.getCurrencyType());
-
+			auctionDetail.setStatusId(AuctionStatusEnum.getType(auction.getStatusId()));
+			auctionDetail.setWinner(winner);
+			
 			return auctionDetail;
 
 		} catch (HibernateException e) {
@@ -150,5 +160,54 @@ public class AuctionService implements IAuctionService {
 		}
 
 		return auctionDetail;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void checkEndedAuctions() {
+		Session session = factory.openSession();
+		Date today = new Date();
+		Transaction tx = null;
+
+		try {
+			SQLQuery sqlQuery = (SQLQuery) session
+					.createSQLQuery(
+							"select * from Auction where statusId=:statusId")
+					.setParameter("statusId", AuctionStatusEnum.Started.getId());
+			List<Auction> auctions = (ArrayList<Auction>) sqlQuery.addEntity(
+					Auction.class).list();
+
+			for (Auction auction : auctions) {
+				Hibernate.initialize(auction.getBids());
+				List<Bid> bids =  new ArrayList<Bid>(auction.getBids());
+
+				if (bids.size() > 0) {
+					Bid lowestBid = bids.get(0);
+					for (int i = 1; i < bids.size(); i++) {
+						Bid newBid = bids.get(i);
+
+						if (lowestBid.getAmount() <= newBid.getAmount()) {
+							lowestBid = newBid;
+						}
+					}
+					Hibernate.initialize(lowestBid.getUser());
+					User winner = lowestBid.getUser();
+
+					if (lowestBid.getAmount() <= auction.getTargetPrice() 
+							|| auction.getEndDate().compareTo(today) <= 0) {
+						
+						auction.setUserByWinnerId(winner);
+						auction.setStatusId(AuctionStatusEnum.Ended.getId());
+						tx = session.beginTransaction();
+						session.update(auction);
+						tx.commit();
+					}
+				}
+			}
+		} catch (HibernateException e) {
+			e.printStackTrace();
+		} finally {
+			session.flush();
+			session.close();
+		}
 	}
 }

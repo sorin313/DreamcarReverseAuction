@@ -28,7 +28,7 @@ public class CompanyService implements ICompanyService {
 	}
 	
 	private static SessionFactory factory = SessionFactoryHelper
-			.getSessionFactory();
+			.getSessionfactory();
 
 	@SuppressWarnings("unchecked")
 	private List<Company> getCompanies() {

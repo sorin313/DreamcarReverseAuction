@@ -17,11 +17,11 @@ import packt.java.spring.mvc.dreamcar.viewmodels.RegisterViewModel;
 @Service
 public class UserService implements IUserInterface {
 
+	private static final SessionFactory factory = SessionFactoryHelper
+			.getSessionfactory();
+	
 	public UserService() {
 	}
-
-	private static SessionFactory factory = SessionFactoryHelper
-			.getSessionFactory();
 
 	public LoggedUserViewModel validateLogin(LoginViewModel loginViewModel) {
 		Session session = factory.openSession();
